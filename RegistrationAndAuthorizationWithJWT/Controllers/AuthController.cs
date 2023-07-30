@@ -1,6 +1,4 @@
 ﻿using BusinessLogic;
-using BusinessLogic.Errors;
-using DBLibrary;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RegistrationAndAuthorizationWithJWT.ViewModels;
@@ -12,12 +10,13 @@ namespace RegistrationAndAuthorizationWithJWT.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthManager _authManager;
+
         public AuthController(IAuthManager authManager)
         {
             _authManager = authManager;
         }
+
         [AllowAnonymous]
-        [Authorize]
         [HttpPost]
         [Route(nameof(Login))]
         public IActionResult Login([FromBody] LoginViewModel loginModel)
@@ -25,24 +24,16 @@ namespace RegistrationAndAuthorizationWithJWT.Controllers
             try
             {
                 var token = _authManager.Login(loginModel.LoginToBLModel());
-                if (token != null)
-                    return Ok(token);
-                else
-                    return NotFound("User not found");
+
+                return Ok(token);
             }
-            catch (IncorrectInpuException)
+            catch (Exception ex)
             {
-                return NotFound("Incorrect data");
-            }
-            catch (UserNotFoundException)
-            {
-                return NotFound("User not found");
-            }
-            catch (IncorrectPasswordException)
-            {
-                return NotFound("Incorrect password");
+                return StatusCode(500,ex.Message);
             }
         }
+
+        [AllowAnonymous]
         [HttpPost]
         [Route(nameof(Register))]
         public IActionResult Register([FromBody] RegisterViewModel registerModel)
@@ -50,18 +41,12 @@ namespace RegistrationAndAuthorizationWithJWT.Controllers
             try
             {
                 var token = _authManager.Register(registerModel.RegisterToBLModel());
-                if (token != null)
-                    return Ok(token);
-                else
-                    return NotFound("Incorrect data");
+
+                return Ok(token);
             }
-            catch (IncorrectInpuException)
+            catch (Exception ex)
             {
-                return NotFound("Incorrect data");
-            }
-            catch (UserExistsException)
-            {
-                return NotFound("User with this Username already exists");
+                return StatusCode(500, ex.Message);
             }
         }
 

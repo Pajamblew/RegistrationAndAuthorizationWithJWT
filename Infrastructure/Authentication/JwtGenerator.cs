@@ -2,23 +2,21 @@
 using DBLibrary.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Authentication
 {
     public class JwtGenerator : IJwtGenerator
     {
         private readonly JwtOptions _options;
+
         public JwtGenerator(IOptions<JwtOptions> options)
         {
             _options = options.Value;
         }
+
         public string GenerateJwt(User user)
         {
             var claims = new Claim[] 
@@ -39,8 +37,10 @@ namespace Infrastructure.Authentication
                 DateTime.UtcNow.AddMinutes(30),
                 singingCredentials);
 
-            string tokenValue = new JwtSecurityTokenHandler()
+            string? tokenValue = new JwtSecurityTokenHandler()
                 .WriteToken(token);
+            if (tokenValue == null)
+                throw new Exception("Failed to generate token");
 
             return tokenValue;
         }

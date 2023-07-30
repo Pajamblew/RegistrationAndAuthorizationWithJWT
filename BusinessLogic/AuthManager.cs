@@ -1,5 +1,5 @@
 ﻿using BusinessLogic.Abstractions;
-using BusinessLogic.Errors;
+using BusinessLogic.Exceptions;
 using BusinessLogic.Models;
 using DBLibrary;
 using DBLibrary.Models;
@@ -18,6 +18,7 @@ namespace BusinessLogic
         private readonly DataContext _dbContext;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IJwtGenerator _jwtGenerator;
+
         public AuthManager(DataContext dataContext, IPasswordHasher passwordHasher, IJwtGenerator jwtGenerator)
         {
             _dbContext = dataContext;
@@ -28,18 +29,18 @@ namespace BusinessLogic
         {
             if (loginModel.Password.IsNullOrEmpty() || loginModel.Username.IsNullOrEmpty())
             {
-                throw new IncorrectInpuException();
+                throw new IncorrectInputException("Incorrect data");
             }
 
             var user = _dbContext.Users.FirstOrDefault(u => u.Username == loginModel.Username);
             if (user == null)
             {
-                throw new UserNotFoundException();
+                throw new UserNotFoundException("User not found");
             }
             var result = _passwordHasher.Verify(user.PasswordHash, loginModel.Password);
             if (!result)
             {
-                throw new IncorrectPasswordException();
+                throw new IncorrectPasswordException("Incorrect password");
             }
             var token = _jwtGenerator.GenerateJwt(user);
             return token;
@@ -48,11 +49,11 @@ namespace BusinessLogic
         {
             if (registerModel.Name.IsNullOrEmpty() || registerModel.Password.IsNullOrEmpty() || registerModel.Username.IsNullOrEmpty())
             {
-                throw new IncorrectInpuException();
+                throw new IncorrectInputException("Incorrect parameters have been passed");
             }
             if (_dbContext.Users.FirstOrDefault(u => u.Username == registerModel.Username) != null)
             {
-                throw new UserExistsException();
+                throw new UserExistsException("This username is already been taken");
             }
 
             var passwordHash = _passwordHasher.Hash(registerModel.Password);

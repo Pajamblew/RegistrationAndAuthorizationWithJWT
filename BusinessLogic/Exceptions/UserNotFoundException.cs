@@ -4,11 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLogic.Errors
+namespace BusinessLogic.Exceptions
 {
     public class UserNotFoundException : Exception
     {
-        public UserNotFoundException() : base()
+        public UserNotFoundException()
+        {
+
+        }
+        public UserNotFoundException(string message) : base(message)
         {
 
         }

@@ -4,11 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLogic.Errors
+namespace BusinessLogic.Exceptions
 {
     public class IncorrectPasswordException : Exception
     {
-        public IncorrectPasswordException() : base()
+        public IncorrectPasswordException()
+        {
+
+        }
+        public IncorrectPasswordException(string message) : base(message)
         {
 
         }

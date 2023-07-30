@@ -4,11 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLogic.Errors
+namespace BusinessLogic.Exceptions
 {
     public class UserExistsException : Exception
     {
-        public UserExistsException() : base()
+        public UserExistsException()
+        {
+
+        }
+        public UserExistsException(string message) : base(message)
         {
 
         }
